@@ -1,0 +1,33 @@
+name: Rebase Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs every day at midnight
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the branch
+        uses: actions/checkout@v2
+        with:
+          ref: your-branch-name  # Replace with your branch name
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "your-email@example.com"  # Replace with your email
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/mcMMO-Dev/mcMMO  # Replace with your upstream repo
+          git fetch upstream
+
+      - name: Rebase with upstream
+        run: |
+          git rebase upstream/main  # Replace main with your upstream branch if different
+
+      - name: Push changes
+        run: |
+          git push origin your-branch-name --force  # Replace with your branch name
