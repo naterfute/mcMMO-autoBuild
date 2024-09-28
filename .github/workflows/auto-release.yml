@@ -41,7 +41,7 @@ jobs:
       run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     
     - name: Deploy to GitHub Releases
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4.4.0
       with:
         name: mcMMO-${{ steps.short_sha.outputs.sha_short }}
         path: target/*.jar

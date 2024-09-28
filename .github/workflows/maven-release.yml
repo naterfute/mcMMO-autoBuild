@@ -22,7 +22,7 @@ jobs:
       run: mvn clean package install
 
     - name: Deploy to GitHub Releases
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4.4.0
       with:
         name: ${{ env.GITHUB_REPOSITORY }}-v${{ env.GITHUB_SHA }}
         path: target/*.jar
