@@ -1,46 +1,41 @@
-name: Build and Release Maven App
+name: Build and Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*' 
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'  
-          distribution: 'adopt'
+    - name: Set up Java Environment
+      uses: actions/setup-java@v1
+      with:
+        java-version: 19
 
-      - name: Build with Maven
-        run: mvn clean package 
+    - name: Build and Test
+      run: mvn clean package install
 
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref }}  
-          release_name: Release ${{ github.ref }}  
-          body: |
-            Release notes for version ${{ github.ref }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}  
-
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          assets: |
-            target/mcMMO.jar
-            target/original-mcMMO.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+    - name: Deploy to GitHub Releases
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.GITHUB_REPOSITORY }}-v${{ env.GITHUB_SHA }}
+        path: target/*.jar
+    - name: LS
+      run: ls target
+    - name: Push Tag
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ env.GITHUB_SHA }}
+        release_name: Release ${{ env.GITHUB_SHA }}
+        draft: false
+        prerelease: false
+        upload_url: https://uploads.github.com/repos/${{ env.GITHUB_REPOSITORY }}/releases/${{ env.release_id }}/assets{?name,label}
+        artifact_paths: target/*.jar
